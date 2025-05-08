@@ -4,7 +4,7 @@ import java.awt.event.*;
 
 public class ChickenCrossingGame extends JPanel implements ActionListener, KeyListener {
     private Timer timer;
-    private int chickenX = 200, chickenY = 300; // 調整初始 Y 軸位置
+    private int chickenX = 200, chickenY = 270; // 調整初始 Y 軸位置
 
     private int car1X = 500, car1Y = 170; // 紅車（右→左）
     private int car2X = -100, car2Y = 210; // 藍車（左→右），稍微調整初始 Y 軸
@@ -51,16 +51,20 @@ public class ChickenCrossingGame extends JPanel implements ActionListener, KeyLi
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        int width = getWidth(); // 取得目前 JPanel 的寬度 (全螢幕寬度)
-        int height = getHeight(); // 取得目前 JPanel 的高度 (全螢幕高度)
+        int width = getWidth();
+        int height = getHeight();
 
         // 背景
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, width, height);
 
-        // 馬路
-        g.setColor(Color.GRAY);
-        g.fillRect(0, (int) (height * 0.3), width, (int) (height * 0.2)); // 調整馬路位置和高度
+        // 馬路 1 (與紅車切齊)
+        g.setColor(Color.LIGHT_GRAY); // 你可以選擇你想要的顏色
+        g.fillRect(0, car1Y, width, objectHeight);
+
+        // 馬路 2 (與藍車切齊)
+        g.setColor(Color.DARK_GRAY); // 你可以選擇你想要的顏色
+        g.fillRect(0, car2Y, width, objectHeight);
 
         // 小雞
         g.setColor(Color.YELLOW);
@@ -79,13 +83,13 @@ public class ChickenCrossingGame extends JPanel implements ActionListener, KeyLi
         Font font16 = new Font("Dialog", Font.PLAIN, 16);
         Font font30 = new Font("Dialog", Font.BOLD, 30);
 
-        // 顯示關卡資訊 (位置可能需要調整)
+        // 顯示關卡資訊
         g.setColor(Color.BLACK);
         g.setFont(font14);
-        g.drawString("等級：" + level, width - 100, 30); // 靠右顯示
-        g.drawString("車速：" + carSpeed, 30, 30); // 靠左顯示
+        g.drawString("等級：" + level, width - 100, 30);
+        g.drawString("車速：" + carSpeed, 30, 30);
 
-        // 遊戲結束畫面 (位置可能需要調整)
+        // 遊戲結束畫面
         if (gameOver) {
             g.setFont(font30);
             g.drawString("遊戲結束！", width / 2 - 100, height / 2 - 30);
@@ -99,10 +103,10 @@ public class ChickenCrossingGame extends JPanel implements ActionListener, KeyLi
         if (!gameOver) {
             // 移動車子
             car1X -= carSpeed;
-            if (car1X < -carWidth) car1X = getWidth(); // 讓車子從右邊重新出現
+            if (car1X < -carWidth) car1X = getWidth();
 
             car2X += carSpeed;
-            if (car2X > getWidth() + carWidth) car2X = -carWidth; // 讓車子從左邊重新出現
+            if (car2X > getWidth() + carWidth) car2X = -carWidth;
 
             // 車速成長
             timeElapsed++;
@@ -119,7 +123,7 @@ public class ChickenCrossingGame extends JPanel implements ActionListener, KeyLi
             }
 
             // 過馬路成功（進下一關）
-            if (chickenY < (int) (getHeight() * 0.25)) { // 調整過馬路的 Y 軸判斷
+            if (chickenY < (int) (getHeight() * 0.25)) {
                 level++;
                 chickenX = getWidth() / 2 - chickenWidth / 2;
                 chickenY = (int) (getHeight() * 0.9);
@@ -136,7 +140,7 @@ public class ChickenCrossingGame extends JPanel implements ActionListener, KeyLi
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
-        int moveDistance = objectHeight; // 設定移動距離為物件高度
+        int moveDistance = objectHeight;
 
         if (!gameOver) {
             if (key == KeyEvent.VK_LEFT) chickenX -= moveDistance;
@@ -144,7 +148,7 @@ public class ChickenCrossingGame extends JPanel implements ActionListener, KeyLi
             if (key == KeyEvent.VK_UP) chickenY -= moveDistance;
             if (key == KeyEvent.VK_DOWN) chickenY += moveDistance;
 
-            // 邊界檢查，確保小雞不會移出遊戲畫面 (使用全螢幕的寬高)
+            // 邊界檢查
             if (chickenX < 0) chickenX = 0;
             if (chickenX > getWidth() - chickenWidth) chickenX = getWidth() - chickenWidth;
             if (chickenY < 0) chickenY = 0;
