@@ -1,4 +1,3 @@
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -7,6 +6,13 @@ import java.util.List;
 import java.util.Random;
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
+    private String playerName; // 加在類別內部成員變數
+
+public GamePanel(JFrame frame, String playerName) {
+    this.frame = frame;
+    this.playerName = playerName;
+}
+
     private Timer timer;
     private int chickenX, chickenY;
     private int chickenWidth = 40;
@@ -45,7 +51,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
     private Road createRoad(int i, int screenWidth) {
         int roadY = i * objectHeight;
         Color color = (i == roadCount - 1) ? Color.GREEN : ((i % 2 == 0) ? Color.LIGHT_GRAY : Color.DARK_GRAY);
-        int carX = (i == roadCount - 1) ? -carWidth - 1 : (random.nextBoolean() ? screenWidth : -carWidth);
+
+        // ✅ 將車子的初始位置改成隨機（不再靠左右邊）
+        int carX = (i == roadCount - 1) ? -carWidth - 1 : random.nextInt(screenWidth - carWidth);
+
         int speed = (i == roadCount - 1) ? 0 : carSpeed + random.nextInt(3);
         boolean goingRight = (i == roadCount - 1) ? false : random.nextBoolean();
 
@@ -72,7 +81,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         g.setFont(new Font("Dialog", Font.PLAIN, 14));
         g.drawString("等級：" + level, 30, 30);
         g.drawString("車速：" + carSpeed, width - 100, 30);
-
+        g.drawString("玩家：" + playerName, 30, 50); // 加這行顯示名稱
         if (gameOver) {
             g.setFont(new Font("Dialog", Font.BOLD, 30));
             g.drawString("遊戲結束！", width / 2 - 100, height / 2 - 30);
@@ -130,7 +139,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
             if (chickenX < 0) chickenX = 0;
             if (chickenX > getWidth() - chickenWidth) chickenX = getWidth() - chickenWidth;
-            if (chickenY > roads.get(roadCount - 1).getY() + objectHeight) chickenY = roads.get(roadCount - 1).getY() + objectHeight;
+            if (chickenY > roads.get(roadCount - 1).getY() + objectHeight)
+                chickenY = roads.get(roadCount - 1).getY() + objectHeight;
         } else {
             if (key == KeyEvent.VK_R) {
                 restartGame();

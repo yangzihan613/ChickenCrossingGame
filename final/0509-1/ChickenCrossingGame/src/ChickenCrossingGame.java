@@ -119,7 +119,7 @@ public class ChickenCrossingGame extends JPanel implements ActionListener, KeyLi
         g.setFont(font14);
         g.drawString("等級：" + level, 30, 30);
         g.drawString("車速：" + carSpeed, width - 100, 30);
-
+        g.drawString("玩家：" + playerName, 30, 50); // 加這行顯示名稱
         if (gameOver) {
             g.setFont(font30);
             g.drawString("遊戲結束！", width / 2 - 100, height / 2 - 30);
