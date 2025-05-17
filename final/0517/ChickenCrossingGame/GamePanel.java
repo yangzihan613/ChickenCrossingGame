@@ -86,10 +86,28 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         g.drawString("車速：" + carSpeed, width - 100, 30);
 
         if (gameOver) {
+            int textWidthGameOver = g.getFontMetrics(new Font("Dialog", Font.BOLD, 30)).stringWidth("遊戲結束！");
+            int textHeightGameOver = g.getFontMetrics(new Font("Dialog", Font.BOLD, 30)).getHeight();
+            int textWidthRestart = g.getFontMetrics(new Font("Dialog", Font.PLAIN, 16)).stringWidth("Press R to restart, Esc to exit");
+            int textHeightRestart = g.getFontMetrics(new Font("Dialog", Font.PLAIN, 16)).getHeight();
+
+            int padding = 20; // 設定邊框與文字的間距
+            int rectX = width / 2 - Math.max(textWidthGameOver, textWidthRestart) / 2 - padding;
+            int rectY = height / 2 - textHeightGameOver / 2 - textHeightRestart / 2 - padding;
+            int rectWidth = Math.max(textWidthGameOver, textWidthRestart) + 2 * padding;
+            int rectHeight = textHeightGameOver + textHeightRestart + 2 * padding;
+
+            g.setColor(Color.BLACK); // 設定背景顏色為黑色
+            g.fillRect(rectX, rectY, rectWidth, rectHeight); // 繪製黑色背景
+
+            g.setColor(Color.WHITE); // 設定邊框顏色為白色
+            g.drawRect(rectX, rectY, rectWidth, rectHeight); // 繪製白色邊框
+
+            g.setColor(Color.WHITE); // 設定文字顏色為白色
             g.setFont(new Font("Dialog", Font.BOLD, 30));
-            g.drawString("遊戲結束！", width / 2 - 100, height / 2 - 30);
+            g.drawString("遊戲結束！", width / 2 - textWidthGameOver / 2+10, height / 2 - textHeightGameOver / 2+20);
             g.setFont(new Font("Dialog", Font.PLAIN, 16));
-            g.drawString("Press R to restart, Esc to exit", width / 2 - 150, height / 2 + 20);
+            g.drawString("Press R to restart, Esc to exit", width / 2 - textWidthRestart / 2, height / 2 + textHeightRestart+10);
         }
     }
 
@@ -115,7 +133,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
             if (chickenY < 0) {
                 level++;
                 chickenX = random.nextInt(getWidth() - chickenWidth);
-                chickenY = roads.get(roadCount - 1).getY() + objectHeight;
+                chickenY = roads.get(roadCount - 2).getY() + objectHeight;
                 carSpeed = 5 + level;
                 timeElapsed = 0;
 
@@ -179,7 +197,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         for (int i = 0; i < roadCount; i++) {
             roads.add(createRoad(i, getWidth()));
         }
-        chickenY = roads.get(roadCount - 1).getY() + objectHeight;
+        chickenY = roads.get(roadCount - 2).getY() + objectHeight;
 
         timer.start();
         repaint();
