@@ -6,13 +6,6 @@ import java.util.List;
 import java.util.Random;
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
-    private String playerName; // 加在類別內部成員變數
-
-public GamePanel(JFrame frame, String playerName) {
-    this.frame = frame;
-    this.playerName = playerName;
-}
-
     private Timer timer;
     private int chickenX, chickenY;
     private int chickenWidth = 40;
@@ -28,6 +21,9 @@ public GamePanel(JFrame frame, String playerName) {
     private List<Road> roads = new ArrayList<>();
     private int roadCount = 20;
 
+    private List<Integer> carLanes = new ArrayList<>();
+    private int initialCarLanes = 5;
+
     public GamePanel(JFrame frame) {
         this.frame = frame;
     }
@@ -36,14 +32,22 @@ public GamePanel(JFrame frame, String playerName) {
         int screenWidth = frame.getWidth();
         int screenHeight = frame.getHeight();
 
-        chickenX = screenWidth / 2 - chickenWidth / 2;
         objectHeight = screenHeight / roadCount;
+
+        roads.clear();
+        carLanes.clear();
+        while (carLanes.size() < initialCarLanes) {
+            int index = random.nextInt(roadCount - 1); // exclude the last road (grass)
+            if (!carLanes.contains(index)) carLanes.add(index);
+        }
 
         for (int i = 0; i < roadCount; i++) {
             roads.add(createRoad(i, screenWidth));
         }
 
+        chickenX = random.nextInt(screenWidth - chickenWidth);
         chickenY = roads.get(roadCount - 1).getY();
+
         timer = new Timer(30, this);
         timer.start();
     }
@@ -52,11 +56,10 @@ public GamePanel(JFrame frame, String playerName) {
         int roadY = i * objectHeight;
         Color color = (i == roadCount - 1) ? Color.GREEN : ((i % 2 == 0) ? Color.LIGHT_GRAY : Color.DARK_GRAY);
 
-        // ✅ 將車子的初始位置改成隨機（不再靠左右邊）
-        int carX = (i == roadCount - 1) ? -carWidth - 1 : random.nextInt(screenWidth - carWidth);
-
-        int speed = (i == roadCount - 1) ? 0 : carSpeed + random.nextInt(3);
-        boolean goingRight = (i == roadCount - 1) ? false : random.nextBoolean();
+        boolean hasCar = carLanes.contains(i);
+        int carX = hasCar ? (random.nextInt(screenWidth)) : -carWidth - 1;
+        int speed = hasCar ? (carSpeed + random.nextInt(3)) : 0;
+        boolean goingRight = hasCar ? random.nextBoolean() : false;
 
         return new Road(roadY, color, carX, speed, goingRight, carWidth, objectHeight);
     }
@@ -81,12 +84,12 @@ public GamePanel(JFrame frame, String playerName) {
         g.setFont(new Font("Dialog", Font.PLAIN, 14));
         g.drawString("等級：" + level, 30, 30);
         g.drawString("車速：" + carSpeed, width - 100, 30);
-        g.drawString("玩家：" + playerName, 30, 50); // 加這行顯示名稱
+
         if (gameOver) {
             g.setFont(new Font("Dialog", Font.BOLD, 30));
             g.drawString("遊戲結束！", width / 2 - 100, height / 2 - 30);
             g.setFont(new Font("Dialog", Font.PLAIN, 16));
-            g.drawString("按 R 鍵重新開始，Esc 離開", width / 2 - 150, height / 2 + 20);
+            g.drawString("Press R to restart, Esc to exit", width / 2 - 150, height / 2 + 20);
         }
     }
 
@@ -111,10 +114,18 @@ public GamePanel(JFrame frame, String playerName) {
 
             if (chickenY < 0) {
                 level++;
-                chickenX = getWidth() / 2 - chickenWidth / 2;
+                chickenX = random.nextInt(getWidth() - chickenWidth);
                 chickenY = roads.get(roadCount - 1).getY() + objectHeight;
                 carSpeed = 5 + level;
                 timeElapsed = 0;
+
+                if (initialCarLanes < roadCount - 1) initialCarLanes++;
+
+                carLanes.clear();
+                while (carLanes.size() < initialCarLanes) {
+                    int index = random.nextInt(roadCount - 1);
+                    if (!carLanes.contains(index)) carLanes.add(index);
+                }
 
                 roads.clear();
                 for (int i = 0; i < roadCount; i++) {
@@ -139,8 +150,7 @@ public GamePanel(JFrame frame, String playerName) {
 
             if (chickenX < 0) chickenX = 0;
             if (chickenX > getWidth() - chickenWidth) chickenX = getWidth() - chickenWidth;
-            if (chickenY > roads.get(roadCount - 1).getY() + objectHeight)
-                chickenY = roads.get(roadCount - 1).getY() + objectHeight;
+            if (chickenY > roads.get(roadCount - 1).getY() + objectHeight) chickenY = roads.get(roadCount - 1).getY() + objectHeight;
         } else {
             if (key == KeyEvent.VK_R) {
                 restartGame();
@@ -151,13 +161,20 @@ public GamePanel(JFrame frame, String playerName) {
     }
 
     private void restartGame() {
-        chickenX = getWidth() / 2 - chickenWidth / 2;
+        chickenX = random.nextInt(getWidth() - chickenWidth);
         carSpeed = 5;
         timeElapsed = 0;
         level = 1;
         gameOver = false;
+        initialCarLanes = 5;
 
         objectHeight = getHeight() / roadCount;
+        carLanes.clear();
+        while (carLanes.size() < initialCarLanes) {
+            int index = random.nextInt(roadCount - 1);
+            if (!carLanes.contains(index)) carLanes.add(index);
+        }
+
         roads.clear();
         for (int i = 0; i < roadCount; i++) {
             roads.add(createRoad(i, getWidth()));

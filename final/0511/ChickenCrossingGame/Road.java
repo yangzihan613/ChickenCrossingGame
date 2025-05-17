@@ -20,6 +20,8 @@ public class Road {
     }
 
     public void moveCar(int panelWidth) {
+        if (carSpeed <= 0) return;
+
         if (goingRight) {
             carX += carSpeed;
             if (carX > panelWidth + carWidth) carX = -carWidth;
